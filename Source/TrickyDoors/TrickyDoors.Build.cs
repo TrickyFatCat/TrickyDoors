@@ -38,6 +38,8 @@ public class TrickyDoors : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"TrickyAnimationComponents",
+				"TrickyInteractionSystem",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
