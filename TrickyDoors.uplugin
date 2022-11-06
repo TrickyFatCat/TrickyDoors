@@ -34,6 +34,10 @@
 		{
 			"Name": "TrickyAnimationComponents",
 			"Enabled": true
+		},
+		{
+			"Name": "TrickyKeyringSystem",
+			"Enabled": true
 		}
 	]
 }
