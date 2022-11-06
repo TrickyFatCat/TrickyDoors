@@ -22,6 +22,8 @@ enum class EDoorState : uint8
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChangedSignature, EDoorState, NewState);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReversedSignature);
+
 UCLASS()
 class TRICKYDOORS_API ADoorBase : public AActor
 {
@@ -41,8 +43,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Door")
 	FOnStateChangedSignature OnStateChanged;
 
+	UPROPERTY(BlueprintAssignable, Category="Door")
+	FOnReversedSignature OnReversed;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	EDoorState InitialState = EDoorState::Closed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
+	bool bIsReversible = false;
 
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void Open();
@@ -58,6 +66,12 @@ public:
 
 	UFUNCTION(BlueprintGetter, Category="Door")
 	FTimerHandle GetAutoClosingTimer() const;
+	
+	UFUNCTION(BlueprintCallable, Category="Door")
+	void StartAutoClosingTimer(const float Duration);
+
+	UFUNCTION(BlueprintCallable, Category="Door")
+	void StopAutoClosingTimer();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
@@ -75,9 +89,9 @@ protected:
 	UFUNCTION()
 	void ChangeState(const ETimelineAnimationState NewAnimationState);
 
-	UFUNCTION(BlueprintCallable, Category="Door")
-	void StartAutoClosingTimer(const float Duration);
+	UFUNCTION(BlueprintImplementableEvent, Category="Door")
+	void OnDoorChangedState(const EDoorState NewState);
 
-	UFUNCTION(BlueprintCallable, Category="Door")
-	void StopAutoClosingTimer();
+	UFUNCTION(BlueprintImplementableEvent, Category="Door")
+	void OnDoorAnimationReversed();
 };

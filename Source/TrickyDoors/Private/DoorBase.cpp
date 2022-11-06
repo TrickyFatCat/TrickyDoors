@@ -47,22 +47,43 @@ void ADoorBase::Tick(float DeltaTime)
 
 void ADoorBase::Open()
 {
-	if (CurrentState != EDoorState::Closed)
+	switch (CurrentState)
 	{
-		return;
-	}
+	case EDoorState::Closed:
+		DoorAnimationComponent->Start();
+		break;
 
-	DoorAnimationComponent->Start();
+	case EDoorState::Transition:
+		if (bIsReversible)
+		{
+			DoorAnimationComponent->Reverse();
+			OnReversed.Broadcast();
+		}
+
+	default:
+		break;
+	}
 }
 
 void ADoorBase::Close()
 {
-	if (CurrentState != EDoorState::Opened)
+	switch (CurrentState)
 	{
-		return;
-	}
+	case EDoorState::Opened:
+		DoorAnimationComponent->Start();
+		break;
 
-	DoorAnimationComponent->Start();
+	case EDoorState::Transition:
+		if (bIsReversible)
+		{
+			DoorAnimationComponent->Reverse();
+			OnReversed.Broadcast();
+		}
+		break;
+
+	default:
+		break;
+	}
 }
 
 void ADoorBase::SetIsLocked(const bool bIsLocked)
@@ -93,6 +114,7 @@ void ADoorBase::SetIsLocked(const bool bIsLocked)
 		PreviousState = EDoorState::Locked;
 	}
 
+	OnDoorChangedState(CurrentState);
 	OnStateChanged.Broadcast(CurrentState);
 }
 
@@ -131,37 +153,13 @@ void ADoorBase::SetIsEnabled(const bool bIsEnabled)
 		SetActorTickEnabled(false);
 	}
 
+	OnDoorChangedState(CurrentState);
 	OnStateChanged.Broadcast(CurrentState);
 }
 
 FTimerHandle ADoorBase::GetAutoClosingTimer() const
 {
 	return AutoClosingTimer;
-}
-
-void ADoorBase::ChangeState(const ETimelineAnimationState NewAnimationState)
-{
-	PreviousState = CurrentState;
-
-	switch (NewAnimationState)
-	{
-	case ETimelineAnimationState::Begin:
-		CurrentState = EDoorState::Closed;
-		break;
-
-	case ETimelineAnimationState::End:
-		CurrentState = EDoorState::Opened;
-		break;
-
-	case ETimelineAnimationState::Transition:
-		CurrentState = EDoorState::Transition;
-		break;
-		
-	default:
-		break;
-	}
-	
-	OnStateChanged.Broadcast(CurrentState);
 }
 
 void ADoorBase::StartAutoClosingTimer(const float Duration)
@@ -192,4 +190,30 @@ void ADoorBase::StopAutoClosingTimer()
 	{
 		TimerManager.ClearTimer(AutoClosingTimer);
 	}
+}
+
+void ADoorBase::ChangeState(const ETimelineAnimationState NewAnimationState)
+{
+	PreviousState = CurrentState;
+
+	switch (NewAnimationState)
+	{
+	case ETimelineAnimationState::Begin:
+		CurrentState = EDoorState::Closed;
+		break;
+
+	case ETimelineAnimationState::End:
+		CurrentState = EDoorState::Opened;
+		break;
+
+	case ETimelineAnimationState::Transition:
+		CurrentState = EDoorState::Transition;
+		break;
+
+	default:
+		break;
+	}
+
+	OnDoorChangedState(CurrentState);
+	OnStateChanged.Broadcast(CurrentState);
 }
