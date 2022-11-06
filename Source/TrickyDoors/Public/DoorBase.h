@@ -6,6 +6,7 @@
 #include "TimelineAnimationComponent.h"
 #include "GameFramework/Actor.h"
 #include "TimelineAnimationComponent.h"
+#include "TimerManager.h"
 #include "DoorBase.generated.h"
 
 
@@ -55,6 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void SetIsEnabled(const bool bIsEnabled);
 
+	UFUNCTION(BlueprintGetter, Category="Door")
+	FTimerHandle GetAutoClosingTimer() const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UTimelineAnimationComponent* DoorAnimationComponent = nullptr;
@@ -65,6 +69,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
 	EDoorState PreviousState = EDoorState::Closed;
 
+	UPROPERTY(BlueprintGetter, Category="Door")
+	FTimerHandle AutoClosingTimer;
+
 	UFUNCTION()
 	void ChangeState(const ETimelineAnimationState NewAnimationState);
+
+	UFUNCTION(BlueprintCallable, Category="Door")
+	void StartAutoClosingTimer(const float Duration);
+
+	UFUNCTION(BlueprintCallable, Category="Door")
+	void StopAutoClosingTimer();
 };

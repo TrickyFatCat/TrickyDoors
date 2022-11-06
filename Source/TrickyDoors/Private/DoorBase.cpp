@@ -4,6 +4,7 @@
 #include "DoorBase.h"
 
 #include "TimelineAnimationComponent.h"
+#include "TimerManager.h"
 
 
 ADoorBase::ADoorBase()
@@ -133,6 +134,11 @@ void ADoorBase::SetIsEnabled(const bool bIsEnabled)
 	OnStateChanged.Broadcast(CurrentState);
 }
 
+FTimerHandle ADoorBase::GetAutoClosingTimer() const
+{
+	return AutoClosingTimer;
+}
+
 void ADoorBase::ChangeState(const ETimelineAnimationState NewAnimationState)
 {
 	PreviousState = CurrentState;
@@ -156,4 +162,34 @@ void ADoorBase::ChangeState(const ETimelineAnimationState NewAnimationState)
 	}
 	
 	OnStateChanged.Broadcast(CurrentState);
+}
+
+void ADoorBase::StartAutoClosingTimer(const float Duration)
+{
+	if (!GetWorld() || Duration <= 0.f)
+	{
+		return;
+	}
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+
+	if (!TimerManager.IsTimerActive(AutoClosingTimer))
+	{
+		TimerManager.SetTimer(AutoClosingTimer, this, &ADoorBase::Close, Duration);
+	}
+}
+
+void ADoorBase::StopAutoClosingTimer()
+{
+	if (!GetWorld())
+	{
+		return;
+	}
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+
+	if (TimerManager.IsTimerActive(AutoClosingTimer))
+	{
+		TimerManager.ClearTimer(AutoClosingTimer);
+	}
 }
