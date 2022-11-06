@@ -83,7 +83,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
 	EDoorState PreviousState = EDoorState::Closed;
 
-	UPROPERTY(BlueprintGetter, Category="Door")
+	UPROPERTY(BlueprintGetter=GetAutoClosingTimer, Category="Door")
 	FTimerHandle AutoClosingTimer;
 
 	UFUNCTION()
