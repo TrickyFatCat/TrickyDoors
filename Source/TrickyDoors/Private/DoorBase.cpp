@@ -102,7 +102,7 @@ void ADoorBase::Close()
 
 void ADoorBase::SetIsLocked(const bool bIsLocked)
 {
-	if (CurrentState == EDoorState::Transition || CurrentState == EDoorState::Disabled)
+	if (CurrentState == EDoorState::Transition || CurrentState == EDoorState::Disabled || CurrentState == EDoorState::Opened)
 	{
 		return;
 	}
