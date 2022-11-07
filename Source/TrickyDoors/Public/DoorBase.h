@@ -87,7 +87,7 @@ protected:
 	FTimerHandle AutoClosingTimer;
 
 	UFUNCTION()
-	void ChangeState(const ETimelineAnimationState NewAnimationState);
+	virtual void ChangeState(const ETimelineAnimationState NewAnimationState);
 
 	UFUNCTION(BlueprintImplementableEvent, Category="Door")
 	void OnDoorChangedState(const EDoorState NewState);
