@@ -40,6 +40,7 @@ void ADoorBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	DoorAnimationComponent->OnAnimationFinished.AddDynamic(this, &ADoorBase::ChangeState);
 	CurrentState = InitialState;
 
 	switch (CurrentState)
@@ -68,6 +69,10 @@ void ADoorBase::Open()
 	{
 	case EDoorState::Closed:
 		DoorAnimationComponent->Start();
+		PreviousState = CurrentState;
+		CurrentState = EDoorState::Transition;
+		OnDoorChangedState(CurrentState);
+		OnStateChanged.Broadcast(CurrentState);
 		break;
 
 	case EDoorState::Transition:
@@ -88,6 +93,10 @@ void ADoorBase::Close()
 	{
 	case EDoorState::Opened:
 		DoorAnimationComponent->Start();
+		PreviousState = CurrentState;
+		CurrentState = EDoorState::Transition;
+		OnDoorChangedState(CurrentState);
+		OnStateChanged.Broadcast(CurrentState);
 		break;
 
 	case EDoorState::Transition:
@@ -194,11 +203,11 @@ void ADoorBase::StartAutoClosingTimer(const float Duration)
 	}
 }
 
-void ADoorBase::StopAutoClosingTimer()
+bool ADoorBase::StopAutoClosingTimer()
 {
 	if (!GetWorld())
 	{
-		return;
+		return false;
 	}
 
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
@@ -206,7 +215,10 @@ void ADoorBase::StopAutoClosingTimer()
 	if (TimerManager.IsTimerActive(AutoClosingTimer))
 	{
 		TimerManager.ClearTimer(AutoClosingTimer);
+		return true;
 	}
+
+	return false;
 }
 
 void ADoorBase::ChangeState(const ETimelineAnimationState NewAnimationState)
@@ -221,10 +233,6 @@ void ADoorBase::ChangeState(const ETimelineAnimationState NewAnimationState)
 
 	case ETimelineAnimationState::End:
 		CurrentState = EDoorState::Opened;
-		break;
-
-	case ETimelineAnimationState::Transition:
-		CurrentState = EDoorState::Transition;
 		break;
 
 	default:

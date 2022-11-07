@@ -71,7 +71,7 @@ public:
 	void StartAutoClosingTimer(const float Duration);
 
 	UFUNCTION(BlueprintCallable, Category="Door")
-	void StopAutoClosingTimer();
+	bool StopAutoClosingTimer();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
