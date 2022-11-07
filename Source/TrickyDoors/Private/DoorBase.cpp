@@ -38,6 +38,20 @@ void ADoorBase::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentState = InitialState;
+
+	switch (CurrentState)
+	{
+	case EDoorState::Locked:
+		SetIsLocked(true);
+		break;
+
+	case EDoorState::Disabled:
+		SetIsEnabled(false);
+		break;
+
+	default:
+		break;
+	}
 }
 
 void ADoorBase::Tick(float DeltaTime)
