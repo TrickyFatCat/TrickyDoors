@@ -75,6 +75,9 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	USceneComponent* DoorRootComponent = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UTimelineAnimationComponent* DoorAnimationComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")

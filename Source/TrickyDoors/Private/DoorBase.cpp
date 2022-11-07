@@ -11,6 +11,9 @@ ADoorBase::ADoorBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	DoorRootComponent = CreateDefaultSubobject<USceneComponent>("DoorRoot");
+	SetRootComponent(DoorRootComponent);
+	
 	DoorAnimationComponent = CreateDefaultSubobject<UTimelineAnimationComponent>("DoorAnimation");
 }
 
