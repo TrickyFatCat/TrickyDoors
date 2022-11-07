@@ -34,7 +34,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bIsClosingDelayed = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bAutoClosingEnabled"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bIsClosingDelayed"))
 	float ClosingDelayDuration = 3.f;
 
 private:

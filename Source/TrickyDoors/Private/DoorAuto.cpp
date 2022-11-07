@@ -41,7 +41,10 @@ void ADoorAuto::OnActivationTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 	
 	if (bIsClosingDelayed)
 	{
-		StopAutoClosingTimer();
+		if (StopAutoClosingTimer())
+		{
+			return;
+		}
 	}
 
 	if (KeyClass && bRequiredKey)
