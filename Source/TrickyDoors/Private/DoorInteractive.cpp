@@ -5,49 +5,71 @@
 
 #include "KeyringLibrary.h"
 #include "KeyType.h"
-#include "InteractionTriggers/BoxInteractionTrigger.h"
+#include "Components/BoxComponent.h"
 
 ADoorInteractive::ADoorInteractive()
 {
-	InteractionTriggerComponent = CreateDefaultSubobject<UBoxInteractionTrigger>("InteractionTrigger");
+	InteractionTriggerComponent = CreateDefaultSubobject<UBoxComponent>("InteractionTrigger");
 	InteractionTriggerComponent->SetupAttachment(GetRootComponent());
+	UInteractionLibrary::SetTriggerDefaultCollision(InteractionTriggerComponent);
 }
 
 void ADoorInteractive::BeginPlay()
 {
+	InteractionTriggerComponent->OnComponentBeginOverlap.AddDynamic(this,
+	                                                                &ADoorInteractive::
+	                                                                OnInteractionTriggerBeginOverlap);
+	InteractionTriggerComponent->OnComponentEndOverlap.AddDynamic(this,
+	                                                              &ADoorInteractive::OnInteractionTriggerEndOverlap);
 	Super::BeginPlay();
-
-	InteractionTriggerComponent->OnComponentBeginOverlap.AddDynamic(this, &ADoorInteractive::OnInteractionTriggerBeginOverlap);
 }
 
-bool ADoorInteractive::Interact_Implementation(AActor* OtherActor)
+bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 {
-	bool bResult = false;
-
 	switch (CurrentState)
 	{
 	case EDoorState::Closed:
+		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 		Open();
-		bResult = true;
 		break;
 
 	case EDoorState::Opened:
+		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 		Close();
-		bResult = true;
 		break;
 
 	case EDoorState::Locked:
 		if (UKeyringLibrary::ActorHasKey(OtherActor, KeyClass))
 		{
 			SetIsLocked(false);
-			InteractionTriggerComponent->SetInteractionMessage(InteractionMessagesMap[EDoorState::Closed]);
+			UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
+		}
+		break;
+
+	case EDoorState::Transition:
+		if (bIsReversible)
+		{
+			if (DoorAnimationComponent->Reverse())
+			{
+				switch (DoorAnimationComponent->GetTargetState())
+				{
+				case ETimelineAnimationState::Begin:
+					UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
+					break;
+
+				case ETimelineAnimationState::End:
+					UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Opened]);
+					break;
+				}
+			}
 		}
 		break;
 
 	default:
 		break;
 	}
-	return bResult;
+
+	return true;
 }
 
 void ADoorInteractive::ChangeState(const ETimelineAnimationState NewAnimationState)
@@ -58,16 +80,25 @@ void ADoorInteractive::ChangeState(const ETimelineAnimationState NewAnimationSta
 	case ETimelineAnimationState::End:
 		InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		break;
-		
+
 	case ETimelineAnimationState::Transition:
-		InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (!bIsReversible)
+		{
+			InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 		break;
 
 	default:
 		break;
 	}
-	
+
 	Super::ChangeState(NewAnimationState);
+}
+
+void ADoorInteractive::UpdateInteractionMessage(const AActor* Actor, const FString& NewMessage)
+{
+	InteractionData.InteractionMessage = NewMessage;
+	UInteractionLibrary::UpdateInteractionMessage(Actor, this, NewMessage);
 }
 
 void ADoorInteractive::OnInteractionTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
@@ -82,22 +113,24 @@ void ADoorInteractive::OnInteractionTriggerBeginOverlap(UPrimitiveComponent* Ove
 		return;
 	}
 
+	UInteractionLibrary::AddToInteractionQueue(OtherActor, this, InteractionData);
+
 	switch (CurrentState)
 	{
 	case EDoorState::Closed:
 	case EDoorState::Opened:
-		InteractionTriggerComponent->SetInteractionMessage(InteractionMessagesMap[CurrentState]);
+		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 
 	case EDoorState::Locked:
 		if (bRequiredKey && KeyClass)
 		{
 			if (UKeyringLibrary::ActorHasKey(OtherActor, KeyClass))
 			{
-				InteractionTriggerComponent->SetInteractionMessage(InteractionMessagesMap[CurrentState]);
+				UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 			}
 			else
 			{
-				InteractionTriggerComponent->SetInteractionMessage(CantUnlockMessage);
+				UpdateInteractionMessage(OtherActor, CantUnlockMessage);
 			}
 		}
 		break;
@@ -105,4 +138,17 @@ void ADoorInteractive::OnInteractionTriggerBeginOverlap(UPrimitiveComponent* Ove
 	default:
 		break;
 	}
+}
+
+void ADoorInteractive::OnInteractionTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
+                                                      AActor* OtherActor,
+                                                      UPrimitiveComponent* OtherComp,
+                                                      int32 OtherBodyIndex)
+{
+	if (!IsValid(OtherActor))
+	{
+		return;
+	}
+
+	UInteractionLibrary::RemoveFromInteractionQueue(OtherActor, this);
 }
