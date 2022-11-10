@@ -33,10 +33,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door|Key", meta=(EditCondition="bRequiredKey"))
 	TSubclassOf<UKeyType> KeyClass = nullptr;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Door|Interaction")
 	FInteractionData InteractionData;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Door|Interaction")
 	TMap<EDoorState, FString> InteractionMessages{
 			{EDoorState::Closed, "Open"},
@@ -48,7 +48,6 @@ protected:
 	FString CantUnlockMessage{"Can't unlock"};
 
 
-
 private:
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 
@@ -58,16 +57,16 @@ private:
 
 
 	UFUNCTION()
-	void OnInteractionTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-	                                      AActor* OtherActor,
-	                                      UPrimitiveComponent* OtherComp,
-	                                      int32 OtherBodyIndex,
-	                                      bool bFromSweep,
-	                                      const FHitResult& SweepResult);
+	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+	                           AActor* OtherActor,
+	                           UPrimitiveComponent* OtherComp,
+	                           int32 OtherBodyIndex,
+	                           bool bFromSweep,
+	                           const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnInteractionTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
-	                                    AActor* OtherActor,
-	                                    UPrimitiveComponent* OtherComp,
-	                                    int32 OtherBodyIndex);
+	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
+	                         AActor* OtherActor,
+	                         UPrimitiveComponent* OtherComp,
+	                         int32 OtherBodyIndex);
 };

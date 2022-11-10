@@ -16,11 +16,8 @@ ADoorInteractive::ADoorInteractive()
 
 void ADoorInteractive::BeginPlay()
 {
-	InteractionTriggerComponent->OnComponentBeginOverlap.AddDynamic(this,
-	                                                                &ADoorInteractive::
-	                                                                OnInteractionTriggerBeginOverlap);
-	InteractionTriggerComponent->OnComponentEndOverlap.AddDynamic(this,
-	                                                              &ADoorInteractive::OnInteractionTriggerEndOverlap);
+	InteractionTriggerComponent->OnComponentBeginOverlap.AddDynamic(this, &ADoorInteractive::OnTriggerBeginOverlap);
+	InteractionTriggerComponent->OnComponentEndOverlap.AddDynamic(this, &ADoorInteractive::OnTriggerEndOverlap);
 	Super::BeginPlay();
 }
 
@@ -101,12 +98,12 @@ void ADoorInteractive::UpdateInteractionMessage(const AActor* Actor, const FStri
 	UInteractionLibrary::UpdateInteractionMessage(Actor, this, NewMessage);
 }
 
-void ADoorInteractive::OnInteractionTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-                                                        AActor* OtherActor,
-                                                        UPrimitiveComponent* OtherComp,
-                                                        int32 OtherBodyIndex,
-                                                        bool bFromSweep,
-                                                        const FHitResult& SweepResult)
+void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
+                                             AActor* OtherActor,
+                                             UPrimitiveComponent* OtherComp,
+                                             int32 OtherBodyIndex,
+                                             bool bFromSweep,
+                                             const FHitResult& SweepResult)
 {
 	if (!IsValid(OtherActor))
 	{
@@ -140,10 +137,10 @@ void ADoorInteractive::OnInteractionTriggerBeginOverlap(UPrimitiveComponent* Ove
 	}
 }
 
-void ADoorInteractive::OnInteractionTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
-                                                      AActor* OtherActor,
-                                                      UPrimitiveComponent* OtherComp,
-                                                      int32 OtherBodyIndex)
+void ADoorInteractive::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
+                                           AActor* OtherActor,
+                                           UPrimitiveComponent* OtherComp,
+                                           int32 OtherBodyIndex)
 {
 	if (!IsValid(OtherActor))
 	{
