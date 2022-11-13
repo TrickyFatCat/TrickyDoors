@@ -38,6 +38,11 @@ void ADoorAuto::OnActivationTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 	{
 		return;
 	}
+
+	if (bCalculateSwingDirection && CurrentState == EDoorState::Closed)
+	{
+		CalculateSwingDirection(OtherActor);
+	}
 	
 	if (bIsClosingDelayed)
 	{

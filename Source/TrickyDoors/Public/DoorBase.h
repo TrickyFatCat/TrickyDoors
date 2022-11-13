@@ -51,6 +51,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bIsReversible = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
+	bool bCalculateSwingDirection = false;
 
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void Open();
@@ -73,6 +76,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Door")
 	bool StopAutoClosingTimer();
 
+	UFUNCTION(BlueprintCallable, Category="Door")
+	void CalculateSwingDirection(const AActor* Actor);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	USceneComponent* DoorRootComponent = nullptr;
@@ -89,6 +95,12 @@ protected:
 	UPROPERTY(BlueprintGetter=GetAutoClosingTimer, Category="Door")
 	FTimerHandle AutoClosingTimer;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
+	int32 SwingDirection = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
+	int32 PrevSwingDirection = 0.f;
+	
 	UFUNCTION()
 	virtual void ChangeState(const ETimelineAnimationState NewAnimationState);
 

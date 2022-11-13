@@ -27,6 +27,12 @@ bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 	{
 	case EDoorState::Closed:
 		UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Opened]);
+
+		if (bCalculateSwingDirection)
+		{
+			CalculateSwingDirection(OtherActor);
+		}
+		
 		Open();
 
 		if (!bIsReversible)
