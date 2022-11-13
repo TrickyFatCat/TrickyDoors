@@ -49,7 +49,7 @@ void ADoorAuto::OnActivationTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
 
 	if (KeyClass && bRequiredKey)
 	{
-		if (UKeyringLibrary::ActorUseKey(OtherActor, KeyClass))
+		if (UKeyringLibrary::UseKey(OtherActor, KeyClass))
 		{
 			Open();
 		}

@@ -26,13 +26,23 @@ bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 	switch (CurrentState)
 	{
 	case EDoorState::Closed:
-		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
+		UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Opened]);
 		Open();
+
+		if (!bIsReversible)
+		{
+			InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 		break;
 
 	case EDoorState::Opened:
-		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
+		UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
 		Close();
+		
+		if (!bIsReversible)
+		{
+			InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 		break;
 
 	case EDoorState::Locked:
@@ -77,14 +87,7 @@ void ADoorInteractive::ChangeState(const ETimelineAnimationState NewAnimationSta
 	case ETimelineAnimationState::End:
 		InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		break;
-
-	case ETimelineAnimationState::Transition:
-		if (!bIsReversible)
-		{
-			InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-		break;
-
+		
 	default:
 		break;
 	}
