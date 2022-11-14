@@ -99,6 +99,11 @@ void ADoorInteractive::ChangeState(const ETimelineAnimationState NewAnimationSta
 	}
 
 	Super::ChangeState(NewAnimationState);
+
+	if (CurrentState ==  EDoorState::Opened && !bIsActorInTrigger)
+	{
+		StartAutoClosingTimer(ClosingDelayDuration);
+	}
 }
 
 void ADoorInteractive::UpdateInteractionMessage(const AActor* Actor, const FString& NewMessage)
@@ -119,7 +124,11 @@ void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp
 		return;
 	}
 
-	UInteractionLibrary::AddToInteractionQueue(OtherActor, this, InteractionData);
+	if (UInteractionLibrary::AddToInteractionQueue(OtherActor, this, InteractionData))
+	{
+		bIsActorInTrigger = true;
+		StopAutoClosingTimer();
+	}
 
 	switch (CurrentState)
 	{
@@ -156,5 +165,13 @@ void ADoorInteractive::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedCompon
 		return;
 	}
 
-	UInteractionLibrary::RemoveFromInteractionQueue(OtherActor, this);
+	if (UInteractionLibrary::RemoveFromInteractionQueue(OtherActor, this))
+	{
+		bIsActorInTrigger = false;
+
+		if (CurrentState == EDoorState::Opened)
+		{
+			StartAutoClosingTimer(ClosingDelayDuration);
+		}
+	}
 }

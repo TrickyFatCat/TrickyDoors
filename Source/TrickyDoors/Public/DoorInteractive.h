@@ -28,6 +28,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UBoxComponent* InteractionTriggerComponent = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
+	bool bIsClosingDelayed = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bIsClosingDelayed"))
+	float ClosingDelayDuration = 3.f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door|Key")
 	bool bRequiredKey = false;
 
@@ -49,6 +55,8 @@ protected:
 
 
 private:
+	bool bIsActorInTrigger = false;
+	
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 
 	virtual void ChangeState(const ETimelineAnimationState NewAnimationState) override;
