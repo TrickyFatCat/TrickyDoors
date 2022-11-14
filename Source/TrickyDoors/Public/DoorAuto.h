@@ -8,8 +8,9 @@
 
 class UBoxComponent;
 class UKeyType;
+
 /**
- * 
+ * A door which can be opened automatically by entering a trigger. 
  */
 UCLASS()
 class TRICKYDOORS_API ADoorAuto : public ADoorBase
@@ -22,18 +23,22 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Coponents")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Coponents")
 	UBoxComponent* ActivationTriggerComponent = nullptr;
 
+	/**Toggles if the door requires a key to open it.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bRequiredKey = false;
 
+	/**Key class which the actor must have to open the door.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bRequiredKey"))
 	TSubclassOf<UKeyType> KeyClass = nullptr;
 
+	/**Toggles if the door will close automatically after some time.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bIsClosingDelayed = false;
 
+	/**Delay after which the opened door will close automatically.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bIsClosingDelayed"))
 	float ClosingDelayDuration = 3.f;
 

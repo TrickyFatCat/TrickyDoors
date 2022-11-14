@@ -24,6 +24,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChangedSignature, EDoorState
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReversedSignature);
 
+/**
+ * A base door class which contains the basic door logic.
+ */
 UCLASS()
 class TRICKYDOORS_API ADoorBase : public AActor
 {
@@ -40,50 +43,62 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	/**Called when current state was changed.*/
 	UPROPERTY(BlueprintAssignable, Category="Door")
 	FOnStateChangedSignature OnStateChanged;
 
+	/**Called when the door animation was reversed.*/
 	UPROPERTY(BlueprintAssignable, Category="Door")
 	FOnReversedSignature OnReversed;
-	
+
+	/**Initial state of the door.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	EDoorState InitialState = EDoorState::Closed;
-	
+
+	/**Toggles if the door animation can be reversed.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bIsReversible = false;
-	
+
+	/**If true, the rotation offset will be recalculated.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bCalculateSwingDirection = false;
 
+	/**Opens the door.*/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void Open();
 
+	/**Closes the door.*/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void Close();
 
+	/**Sets if the door is locked or not.*/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void SetIsLocked(const bool bIsLocked);
 
+	/**Sets if the door is enabled.*/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void SetIsEnabled(const bool bIsEnabled);
-
+	
 	UFUNCTION(BlueprintGetter, Category="Door")
 	FTimerHandle GetAutoClosingTimer() const;
-	
+
+	/**Starts the timer after which the door will be closed automatically.*/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void StartAutoClosingTimer(const float Duration);
 
+	/**Stops autoclosing timer.*/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	bool StopAutoClosingTimer();
 
+	/**Calculates new rotation offset relative to the given actor.**/
 	UFUNCTION(BlueprintCallable, Category="Door")
 	void CalculateSwingDirection(const AActor* Actor);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	USceneComponent* DoorRootComponent = nullptr;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UTimelineAnimationComponent* DoorAnimationComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
@@ -95,18 +110,18 @@ protected:
 	UPROPERTY(BlueprintGetter=GetAutoClosingTimer, Category="Door")
 	FTimerHandle AutoClosingTimer;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
 	int32 SwingDirection = 0.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
 	int32 PrevSwingDirection = 0.f;
 	
 	UFUNCTION()
 	virtual void ChangeState(const ETimelineAnimationState NewAnimationState);
 
+	/**Called when the current state was changed.*/
 	UFUNCTION(BlueprintImplementableEvent, Category="Door")
 	void OnDoorChangedState(const EDoorState NewState);
 
+	/**Called when the door animation was reversed.*/
 	UFUNCTION(BlueprintImplementableEvent, Category="Door")
 	void OnDoorAnimationReversed();
 };

@@ -12,7 +12,7 @@ class UBoxComponent;
 class UKeyType;
 
 /**
- * 
+ * A door which requires interaction to be opened.
  */
 UCLASS()
 class TRICKYDOORS_API ADoorInteractive : public ADoorBase, public IInteractionInterface
@@ -25,24 +25,29 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UBoxComponent* InteractionTriggerComponent = nullptr;
 
+	/**Toggles if the door requires a key to open it.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
+	bool bRequiredKey = false;
+
+	/**Key class which the actor must have to open the door.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bRequiredKey"))
+	TSubclassOf<UKeyType> KeyClass = nullptr;
+
+	/**Toggles if the door will close automatically after some time.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bIsClosingDelayed = false;
 
+	/**Delay after which the opened door will close automatically.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bIsClosingDelayed"))
 	float ClosingDelayDuration = 3.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door|Key")
-	bool bRequiredKey = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door|Key", meta=(EditCondition="bRequiredKey"))
-	TSubclassOf<UKeyType> KeyClass = nullptr;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Door|Interaction")
 	FInteractionData InteractionData;
 
+	/**Interaction messages for different states of the door.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Door|Interaction")
 	TMap<EDoorState, FString> InteractionMessages{
 			{EDoorState::Closed, "Open"},
@@ -50,13 +55,14 @@ protected:
 			{EDoorState::Locked, "Unlock"}
 	};
 
+	/**The message in case the actor don't have a key to unlock the door.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Door|Interaction")
 	FString CantUnlockMessage{"Can't unlock"};
 
 
 private:
 	bool bIsActorInTrigger = false;
-	
+
 	virtual bool FinishInteraction_Implementation(AActor* OtherActor) override;
 
 	virtual void ChangeState(const ETimelineAnimationState NewAnimationState) override;
