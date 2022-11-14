@@ -43,7 +43,8 @@ protected:
 	/**Delay after which the opened door will close automatically.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bIsClosingDelayed"))
 	float ClosingDelayDuration = 3.f;
-	
+
+	/**Data used for interaction.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Door|Interaction")
 	FInteractionData InteractionData;
 

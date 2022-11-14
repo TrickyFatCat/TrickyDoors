@@ -51,7 +51,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Door")
 	FOnReversedSignature OnReversed;
 
-	/**Initial state of the door.*/
+	/**The door state on begin play.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	EDoorState InitialState = EDoorState::Closed;
 
@@ -59,7 +59,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bIsReversible = false;
 
-	/**If true, the rotation offset will be recalculated.*/
+	/**If true, the rotation offset can be recalculated using the CalculateSwingDirection function.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
 	bool bCalculateSwingDirection = false;
 
