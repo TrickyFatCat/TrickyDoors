@@ -10,7 +10,7 @@
 #include "DoorBase.generated.h"
 
 
-UENUM()
+UENUM(BlueprintType)
 enum class EDoorState : uint8
 {
 	Closed,
