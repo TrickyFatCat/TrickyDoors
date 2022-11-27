@@ -24,11 +24,11 @@ void ADoorBase::OnConstruction(const FTransform& Transform)
 	switch (InitialState)
 	{
 	case EDoorState::Opened:
-		DoorAnimationComponent->InitialState = ETimelineAnimationState::Begin;
+		DoorAnimationComponent->InitialState = ETimelineAnimationState::End;
 		break;
 
 	case EDoorState::Closed:
-		DoorAnimationComponent->InitialState = ETimelineAnimationState::End;
+		DoorAnimationComponent->InitialState = ETimelineAnimationState::Begin;
 		break;
 
 	default:
