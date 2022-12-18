@@ -5,6 +5,7 @@
 
 #include "KeyringLibrary.h"
 #include "KeyType.h"
+#include "LockComponent.h"
 #include "Components/BoxComponent.h"
 
 ADoorInteractive::ADoorInteractive()
@@ -12,6 +13,18 @@ ADoorInteractive::ADoorInteractive()
 	InteractionTriggerComponent = CreateDefaultSubobject<UBoxComponent>("InteractionTrigger");
 	InteractionTriggerComponent->SetupAttachment(GetRootComponent());
 	UInteractionLibrary::SetTriggerDefaultCollision(InteractionTriggerComponent);
+
+	LockComponent = CreateDefaultSubobject<ULockComponent>("LockComponent");
+}
+
+void ADoorInteractive::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	if (LockComponent)
+	{
+		LockComponent->SetIsLocked(InitialState == EDoorState::Locked);
+	}
 }
 
 void ADoorInteractive::BeginPlay()
@@ -32,7 +45,7 @@ bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 		{
 			CalculateSwingDirection(OtherActor);
 		}
-		
+
 		Open();
 
 		if (!bIsReversible)
@@ -44,7 +57,7 @@ bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 	case EDoorState::Opened:
 		UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
 		Close();
-		
+
 		if (!bIsReversible)
 		{
 			InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -52,28 +65,34 @@ bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 		break;
 
 	case EDoorState::Locked:
-		if (UKeyringLibrary::ActorHasKey(OtherActor, KeyClass))
+		if (LockComponent->Unlock(OtherActor))
 		{
 			SetIsLocked(false);
 			UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
 		}
+		else
+		{
+			return false;
+		}
 		break;
 
 	case EDoorState::Transition:
-		if (bIsReversible)
+		if (!bIsReversible)
 		{
-			if (DoorAnimationComponent->Reverse())
+			return false;
+		}
+		
+		if (DoorAnimationComponent->Reverse())
+		{
+			switch (DoorAnimationComponent->GetTargetState())
 			{
-				switch (DoorAnimationComponent->GetTargetState())
-				{
-				case ETimelineAnimationState::Begin:
-					UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
-					break;
+			case ETimelineAnimationState::Begin:
+				UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Closed]);
+				break;
 
-				case ETimelineAnimationState::End:
-					UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Opened]);
-					break;
-				}
+			case ETimelineAnimationState::End:
+				UpdateInteractionMessage(OtherActor, InteractionMessages[EDoorState::Opened]);
+				break;
 			}
 		}
 		break;
@@ -93,14 +112,14 @@ void ADoorInteractive::ChangeState(const ETimelineAnimationState NewAnimationSta
 	case ETimelineAnimationState::End:
 		InteractionTriggerComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		break;
-		
+
 	default:
 		break;
 	}
 
 	Super::ChangeState(NewAnimationState);
 
-	if (CurrentState ==  EDoorState::Opened && !bIsActorInTrigger)
+	if (CurrentState == EDoorState::Opened && !bIsActorInTrigger)
 	{
 		StartAutoClosingTimer(ClosingDelayDuration);
 	}
@@ -137,16 +156,13 @@ void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp
 		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 
 	case EDoorState::Locked:
-		if (bRequiredKey && KeyClass)
+		if (LockComponent->CanUnlock(OtherActor))
 		{
-			if (UKeyringLibrary::ActorHasKey(OtherActor, KeyClass))
-			{
-				UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
-			}
-			else
-			{
-				UpdateInteractionMessage(OtherActor, CantUnlockMessage);
-			}
+			UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
+		}
+		else
+		{
+			UpdateInteractionMessage(OtherActor, CantUnlockMessage);
 		}
 		break;
 

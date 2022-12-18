@@ -9,7 +9,7 @@
 #include "DoorInteractive.generated.h"
 
 class UBoxComponent;
-class UKeyType;
+class ULockComponent;
 
 /**
  * A door which requires interaction to be opened.
@@ -23,18 +23,15 @@ public:
 	ADoorInteractive();
 
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UBoxComponent* InteractionTriggerComponent = nullptr;
 
-	/**Toggles if the door requires a key to open it.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
-	bool bRequiredKey = false;
-
-	/**Key class which the actor must have to open the door.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door", meta=(EditCondition="bRequiredKey"))
-	TSubclassOf<UKeyType> KeyClass = nullptr;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
+	ULockComponent* LockComponent = nullptr;
 
 	/**Toggles if the door will close automatically after some time.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
@@ -60,7 +57,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Door|Interaction")
 	FString CantUnlockMessage{"Can't unlock"};
 
-
 private:
 	bool bIsActorInTrigger = false;
 
@@ -69,7 +65,6 @@ private:
 	virtual void ChangeState(const ETimelineAnimationState NewAnimationState) override;
 
 	void UpdateInteractionMessage(const AActor* Actor, const FString& NewMessage);
-
 
 	UFUNCTION()
 	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
