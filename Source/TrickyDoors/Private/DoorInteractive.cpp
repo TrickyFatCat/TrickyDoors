@@ -22,7 +22,7 @@ void ADoorInteractive::OnConstruction(const FTransform& Transform)
 
 	if (LockComponent)
 	{
-		LockComponent->SetIsLocked(InitialState == EDoorState::Locked);
+		LockComponent->bLockedOnStart = InitialState == EDoorState::Locked;
 	}
 
 	if (InteractionTriggerComponent)

@@ -3,8 +3,6 @@
 
 #include "DoorAuto.h"
 
-#include "KeyringLibrary.h"
-#include "KeyType.h"
 #include "LockComponent.h"
 #include "Components/BoxComponent.h"
 
@@ -28,7 +26,7 @@ void ADoorAuto::OnConstruction(const FTransform& Transform)
 
 	if (LockComponent)
 	{
-		LockComponent->SetIsLocked(InitialState == EDoorState::Locked);
+		LockComponent->bLockedOnStart = InitialState == EDoorState::Locked;
 	}
 }
 
@@ -39,7 +37,7 @@ void ADoorAuto::BeginPlay()
 	ActivationTriggerComponent->OnComponentBeginOverlap.AddDynamic(this, &ADoorAuto::OnActivationTriggerBeginOverlap);
 	ActivationTriggerComponent->OnComponentEndOverlap.AddDynamic(this, &ADoorAuto::OnActivationTriggerEndOverlap);
 
-	LockComponent->SetIsLocked(CurrentState == EDoorState::Locked);
+	LockComponent->bLockedOnStart = CurrentState == EDoorState::Locked;
 }
 
 void ADoorAuto::OnActivationTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
