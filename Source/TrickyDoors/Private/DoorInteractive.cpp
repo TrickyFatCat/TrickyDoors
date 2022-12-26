@@ -155,7 +155,7 @@ void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp
 		UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 
 	case EDoorState::Locked:
-		if (LockComponent->CanUnlock(OtherActor))
+		if (LockComponent->CanUseLock(OtherActor))
 		{
 			UpdateInteractionMessage(OtherActor, InteractionMessages[CurrentState]);
 		}
