@@ -8,8 +8,8 @@
 #include "InteractionLibrary.h"
 #include "DoorInteractive.generated.h"
 
-class UBoxComponent;
 class ULockComponent;
+class UBoxInteractionComponent;
 
 /**
  * A door which requires interaction to be opened.
@@ -24,11 +24,11 @@ public:
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
-	
+
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
-	UBoxComponent* InteractionTriggerComponent = nullptr;
+	UBoxInteractionComponent* InteractionTriggerComponent = nullptr;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
 	ULockComponent* LockComponent = nullptr;
@@ -48,9 +48,9 @@ protected:
 	/**Interaction messages for different states of the door.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Door|Interaction")
 	TMap<EDoorState, FString> InteractionMessages{
-			{EDoorState::Closed, "Open"},
-			{EDoorState::Opened, "Close"},
-			{EDoorState::Locked, "Unlock"}
+		{EDoorState::Closed, "Open"},
+		{EDoorState::Opened, "Close"},
+		{EDoorState::Locked, "Unlock"}
 	};
 
 	/**The message in case the actor don't have a key to unlock the door.*/
@@ -75,8 +75,8 @@ private:
 	                           const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
-	                         AActor* OtherActor,
-	                         UPrimitiveComponent* OtherComp,
-	                         int32 OtherBodyIndex);
+	void OnActorAddedToQueue(const AActor* OtherActor);
+
+	UFUNCTION()
+	void OnActorRemovedFromQueue(const AActor* OtherActor);
 };

@@ -3,14 +3,13 @@
 
 #include "DoorInteractive.h"
 
-#include "KeyringLibrary.h"
-#include "KeyType.h"
+#include "BoxInteractionComponent.h"
 #include "LockComponent.h"
 #include "Components/BoxComponent.h"
 
 ADoorInteractive::ADoorInteractive()
 {
-	InteractionTriggerComponent = CreateDefaultSubobject<UBoxComponent>("InteractionTrigger");
+	InteractionTriggerComponent = CreateDefaultSubobject<UBoxInteractionComponent>("InteractionTrigger");
 	InteractionTriggerComponent->SetupAttachment(GetRootComponent());
 	UInteractionLibrary::SetTriggerDefaultCollision(InteractionTriggerComponent);
 
@@ -25,12 +24,18 @@ void ADoorInteractive::OnConstruction(const FTransform& Transform)
 	{
 		LockComponent->SetIsLocked(InitialState == EDoorState::Locked);
 	}
+
+	if (InteractionTriggerComponent)
+	{
+		InteractionTriggerComponent->SetInteractionData(InteractionData);
+	}
 }
 
 void ADoorInteractive::BeginPlay()
 {
 	InteractionTriggerComponent->OnComponentBeginOverlap.AddDynamic(this, &ADoorInteractive::OnTriggerBeginOverlap);
-	InteractionTriggerComponent->OnComponentEndOverlap.AddDynamic(this, &ADoorInteractive::OnTriggerEndOverlap);
+	InteractionTriggerComponent->OnActorAdded.AddDynamic(this, &ADoorInteractive::OnActorAddedToQueue);
+	InteractionTriggerComponent->OnActorRemoved.AddDynamic(this, &ADoorInteractive::OnActorRemovedFromQueue);
 	Super::BeginPlay();
 }
 
@@ -81,7 +86,7 @@ bool ADoorInteractive::FinishInteraction_Implementation(AActor* OtherActor)
 		{
 			return false;
 		}
-		
+
 		if (DoorAnimationComponent->Reverse())
 		{
 			switch (DoorAnimationComponent->GetTargetState())
@@ -128,7 +133,7 @@ void ADoorInteractive::ChangeState(const ETimelineAnimationState NewAnimationSta
 void ADoorInteractive::UpdateInteractionMessage(const AActor* Actor, const FString& NewMessage)
 {
 	InteractionData.InteractionMessage = NewMessage;
-	UInteractionLibrary::UpdateInteractionMessage(Actor, this, NewMessage);
+	InteractionTriggerComponent->SetInteractionMessage(Actor, NewMessage);
 }
 
 void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent,
@@ -142,13 +147,7 @@ void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		return;
 	}
-
-	if (UInteractionLibrary::AddToInteractionQueue(OtherActor, this, InteractionData))
-	{
-		bIsActorInTrigger = true;
-		StopAutoClosingTimer();
-	}
-
+	
 	switch (CurrentState)
 	{
 	case EDoorState::Closed:
@@ -171,23 +170,28 @@ void ADoorInteractive::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp
 	}
 }
 
-void ADoorInteractive::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
-                                           AActor* OtherActor,
-                                           UPrimitiveComponent* OtherComp,
-                                           int32 OtherBodyIndex)
+void ADoorInteractive::OnActorAddedToQueue(const AActor* OtherActor)
 {
 	if (!IsValid(OtherActor))
 	{
 		return;
 	}
 
-	if (UInteractionLibrary::RemoveFromInteractionQueue(OtherActor, this))
-	{
-		bIsActorInTrigger = false;
+	bIsActorInTrigger = true;
+	StopAutoClosingTimer();
+}
 
-		if (CurrentState == EDoorState::Opened)
-		{
-			StartAutoClosingTimer(ClosingDelayDuration);
-		}
+void ADoorInteractive::OnActorRemovedFromQueue(const AActor* OtherActor)
+{
+	if (!IsValid(OtherActor))
+	{
+		return;
+	}
+
+	bIsActorInTrigger = false;
+
+	if (CurrentState == EDoorState::Opened)
+	{
+		StartAutoClosingTimer(ClosingDelayDuration);
 	}
 }
