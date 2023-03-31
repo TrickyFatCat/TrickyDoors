@@ -6,9 +6,9 @@ A plugin with a collection of door actors.
 
 This plugin required this plugins to work:
 
-1. [**TrickyInteractionSystem**](https://github.com/TrickyFatCat/TrickyInteractionSystem/releases) v1.3 and higher;
-2. [**TrickyAnimationComponents**](https://github.com/TrickyFatCat/TrickyAnimationComponents/releases) v1.2 and higher;
-3. [**TrickyKeyringSystem**](https://github.com/TrickyFatCat/TrickyKeyringSystem/releases) v1.2 and higher;
+1. [**TrickyInteractionSystem**](https://github.com/TrickyFatCat/TrickyInteractionSystem/releases) v2.0 and higher;
+2. [**TrickyAnimationComponents**](https://github.com/TrickyFatCat/TrickyAnimationComponents/releases) v2.0 and higher;
+3. [**TrickyKeyringSystem**](https://github.com/TrickyFatCat/TrickyKeyringSystem/releases) v2.0 and higher;
 
 Install them before installing this plugin.
 
@@ -21,7 +21,9 @@ The plugin can be used in both C++ and Blueprint projects.
 **At the moment, the package is compatible only with Unreal Engine 4.**
 
 1. Download the latest [**package file**](https://github.com/TrickyFatCat/TrickyDoors/releases);
-2. Unzip the package to the Plugins folder in engine folder, e.g. `C:\Program Files\Epic Games\UE_4.27\Engine\Plugins`;
+2. Install the plugin either in your project or for all projects in engine:
+    * Unzip the package into Plugins folder of your project, e.g. `D:\UnrealProjects\MyProject\Plugins`;
+    * Unzip the package to the Plugins folder in engine folder, e.g. `C:\Program Files\Epic Games\UE_5.0\Engine\Plugins`;
 3. Restart the project;
 
 In this case the plugin can be used for any blueprint project.
