@@ -1,4 +1,4 @@
-// MIT License Copyright (c) 2022 Artyom "Tricky Fat Cat" Volkov
+// MIT License Copyright (c) Artyom "Tricky Fat Cat" Volkov
 
 #pragma once
 
@@ -28,10 +28,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
-	UBoxInteractionComponent* InteractionTriggerComponent = nullptr;
+	TObjectPtr<UBoxInteractionComponent> InteractionTriggerComponent = nullptr;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
-	ULockComponent* LockComponent = nullptr;
+	TObjectPtr<ULockComponent> LockComponent = nullptr;
 
 	/**Toggles if the door will close automatically after some time.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")

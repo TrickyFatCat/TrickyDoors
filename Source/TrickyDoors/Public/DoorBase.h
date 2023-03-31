@@ -1,4 +1,4 @@
-﻿// MIT License Copyright (c) 2022 Artyom "Tricky Fat Cat" Volkov
+﻿// MIT License Copyright (c) Artyom "Tricky Fat Cat" Volkov
 
 #pragma once
 
@@ -96,10 +96,10 @@ public:
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
-	USceneComponent* DoorRootComponent = nullptr;
+	TObjectPtr<USceneComponent> DoorRootComponent = nullptr;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category="Components")
-	UTimelineAnimationComponent* DoorAnimationComponent = nullptr;
+	TObjectPtr<UTimelineAnimationComponent> DoorAnimationComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
 	EDoorState CurrentState = EDoorState::Closed;

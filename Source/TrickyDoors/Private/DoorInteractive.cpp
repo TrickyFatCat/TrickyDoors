@@ -1,4 +1,4 @@
-// MIT License Copyright (c) 2022 Artyom "Tricky Fat Cat" Volkov
+// MIT License Copyright (c) Artyom "Tricky Fat Cat" Volkov
 
 
 #include "DoorInteractive.h"
@@ -11,7 +11,7 @@ ADoorInteractive::ADoorInteractive()
 {
 	InteractionTriggerComponent = CreateDefaultSubobject<UBoxInteractionComponent>("InteractionTrigger");
 	InteractionTriggerComponent->SetupAttachment(GetRootComponent());
-	UInteractionLibrary::SetTriggerDefaultCollision(InteractionTriggerComponent);
+	UInteractionLibrary::SetTriggerDefaultCollision(ToRawPtr(InteractionTriggerComponent));
 
 	LockComponent = CreateDefaultSubobject<ULockComponent>("LockComponent");
 }

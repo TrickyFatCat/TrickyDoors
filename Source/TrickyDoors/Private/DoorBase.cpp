@@ -1,4 +1,4 @@
-﻿// MIT License Copyright (c) 2022 Artyom "Tricky Fat Cat" Volkov
+﻿// MIT License Copyright (c) Artyom "Tricky Fat Cat" Volkov
 
 
 #include "DoorBase.h"
@@ -12,7 +12,7 @@ ADoorBase::ADoorBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	DoorRootComponent = CreateDefaultSubobject<USceneComponent>("DoorRoot");
-	SetRootComponent(DoorRootComponent);
+	SetRootComponent(ToRawPtr(DoorRootComponent));
 	
 	DoorAnimationComponent = CreateDefaultSubobject<UTimelineAnimationComponent>("DoorAnimation");
 }
