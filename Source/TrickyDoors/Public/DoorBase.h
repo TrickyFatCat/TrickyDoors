@@ -22,7 +22,7 @@ enum class EDoorState : uint8
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChangedSignature, EDoorState, NewState);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReversedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoorReversedSignature);
 
 /**
  * A base door class which contains the basic door logic.
@@ -49,7 +49,7 @@ public:
 
 	/**Called when the door animation was reversed.*/
 	UPROPERTY(BlueprintAssignable, Category="Door")
-	FOnReversedSignature OnReversed;
+	FOnDoorReversedSignature OnReversed;
 
 	/**The door state on begin play.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Door")
