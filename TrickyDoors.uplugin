@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
-	"Version": 5,
-	"VersionName": "2.0",
+	"Version": 6,
+	"VersionName": "2.0.1",
 	"FriendlyName": "TrickyDoors",
 	"Description": "A plugin with a collection of door actors.",
 	"Category": "TrickyPrototyping",
