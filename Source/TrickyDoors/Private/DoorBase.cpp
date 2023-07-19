@@ -5,6 +5,7 @@
 
 #include "TimelineAnimationComponent.h"
 #include "TimerManager.h"
+#include "Engine/World.h"
 
 
 ADoorBase::ADoorBase()
